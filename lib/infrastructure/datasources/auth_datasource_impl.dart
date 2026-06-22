@@ -15,17 +15,19 @@ class AuthDatasourceImpl extends AuthDatasource {
   Future<LoginResponse> login({
     required String login,
     required String password,
+    required int agenciaId,
   }) async {
     try {
       final response = await _dio.post(
         '/auth/login',
-        data: {'login': login, 'password': password},
+        data: {'login': login, 'password': password, 'agenciaId': agenciaId},
       );
       return LoginResponse.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      final mensaje = e.response?.data?.toString() ??
-          e.message ??
-          'Error al iniciar sesión';
+      final data = e.response?.data;
+      final mensaje = (data is Map && data['mensaje'] != null)
+          ? data['mensaje'].toString()
+          : e.message ?? 'Error al iniciar sesión';
       throw Exception(mensaje);
     }
   }

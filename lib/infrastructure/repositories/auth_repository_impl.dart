@@ -6,8 +6,8 @@ class AuthRepositoryImpl extends AuthRepository {
   AuthRepositoryImpl({required this.datasource});
 
   @override
-  Future<LoginResponse> login({required String login, required String password}) {
-    return datasource.login(login: login, password: password);
+  Future<LoginResponse> login({required String login, required String password, required int agenciaId}) {
+    return datasource.login(login: login, password: password, agenciaId: agenciaId);
   }
 
   @override

@@ -1,9 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:mostrador_au/presentation/screens/screens.dart';
 
-  final appRouter =  GoRouter(
-    initialLocation: '/login',
+  final appRouter = GoRouter(
+    initialLocation: '/',
     routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const LoadingScreen(),
+      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),

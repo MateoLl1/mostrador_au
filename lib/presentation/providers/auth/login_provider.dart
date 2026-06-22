@@ -2,53 +2,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mostrador_au/domain/domain.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
 
-enum LoginStep { credentials, agencySelection }
-
 class LoginState {
-  final LoginStep step;
-  final bool loading;
-  final String? errorMessage;
-  final LoginResponse? user;
-  final String? password;
+  final bool initLoading;
+  final bool submitLoading;
   final List<Agencia> agencias;
   final Agencia? selectedAgencia;
+  final String? errorMessage;
 
   const LoginState({
-    this.step = LoginStep.credentials,
-    this.loading = false,
-    this.errorMessage,
-    this.user,
-    this.password,
+    this.initLoading = true,
+    this.submitLoading = false,
     this.agencias = const [],
     this.selectedAgencia,
+    this.errorMessage,
   });
 
   LoginState copyWith({
-    LoginStep? step,
-    bool? loading,
-    String? errorMessage,
-    LoginResponse? user,
-    String? password,
+    bool? initLoading,
+    bool? submitLoading,
     List<Agencia>? agencias,
     Agencia? selectedAgencia,
+    String? errorMessage,
     bool clearError = false,
     bool clearAgencia = false,
   }) {
     return LoginState(
-      step: step ?? this.step,
-      loading: loading ?? this.loading,
-      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
-      user: user ?? this.user,
-      password: password ?? this.password,
-      agencias: agencias ?? this.agencias,
-      selectedAgencia: clearAgencia ? null : selectedAgencia ?? this.selectedAgencia,
+      initLoading:    initLoading    ?? this.initLoading,
+      submitLoading:  submitLoading  ?? this.submitLoading,
+      agencias:       agencias       ?? this.agencias,
+      selectedAgencia: clearAgencia  ? null : selectedAgencia ?? this.selectedAgencia,
+      errorMessage:   clearError     ? null : errorMessage    ?? this.errorMessage,
     );
   }
 }
 
 final loginProvider = StateNotifierProvider<LoginNotifier, LoginState>((ref) {
   return LoginNotifier(
-    authRepository: ref.watch(authRepositoryProvider),
+    authRepository:  ref.watch(authRepositoryProvider),
     sessionNotifier: ref.read(appSessionProvider.notifier),
   );
 });
@@ -57,62 +47,51 @@ class LoginNotifier extends StateNotifier<LoginState> {
   final AuthRepository authRepository;
   final AppSessionNotifier sessionNotifier;
 
-  LoginNotifier({
-    required this.authRepository,
-    required this.sessionNotifier,
-  }) : super(const LoginState());
+  LoginNotifier({required this.authRepository, required this.sessionNotifier})
+      : super(const LoginState()) {
+    _loadAgencias();
+  }
 
-  Future<void> login({
-    required String login,
-    required String password,
-  }) async {
-    state = state.copyWith(loading: true, clearError: true);
+  Future<void> _loadAgencias() async {
     try {
-      final user = await authRepository.login(login: login, password: password);
       final agencias = await authRepository.getAgencias();
       state = state.copyWith(
-        loading: false,
-        step: LoginStep.agencySelection,
-        user: user,
-        password: password,
+        initLoading: false,
         agencias: agencias,
         selectedAgencia: agencias.isNotEmpty ? agencias.first : null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        loading: false,
-        errorMessage: e.toString().replaceFirst('Exception: ', ''),
-      );
+    } catch (_) {
+      state = state.copyWith(initLoading: false);
     }
   }
 
-  void selectAgencia(Agencia agencia) {
-    state = state.copyWith(selectedAgencia: agencia);
-  }
+  void selectAgencia(Agencia agencia) => state = state.copyWith(selectedAgencia: agencia);
 
-  void confirmAgencia() {
-    final user = state.user;
+  Future<void> login({required String login, required String password}) async {
     final agencia = state.selectedAgencia;
-    if (user == null || agencia == null) return;
+    if (agencia == null) return;
 
-    sessionNotifier.setSession(
-      AppSession(
-        usCodigo: user.usCodigo,
-        usNombre: user.usNombre,
-        usLogin: user.usLogin,
-        usPassword: state.password ?? '',
-        puModulo: user.puModulo,
+    state = state.copyWith(submitLoading: true, clearError: true);
+    try {
+      final user = await authRepository.login(
+        login:     login,
+        password:  password,
         agenciaId: agencia.agCodigo,
+      );
+      sessionNotifier.setSession(AppSession(
+        usCodigo:      user.usCodigo,
+        usNombre:      user.usNombre,
+        usLogin:       user.usLogin,
+        usPassword:    user.usPassword,
+        puModulo:      user.puModulo ?? '',
+        agenciaId:     agencia.agCodigo,
         agenciaNombre: agencia.agNombre,
-      ),
-    );
-  }
-
-  void goBack() {
-    state = state.copyWith(
-      step: LoginStep.credentials,
-      clearError: true,
-      clearAgencia: true,
-    );
+      ));
+    } catch (e) {
+      state = state.copyWith(
+        submitLoading: false,
+        errorMessage: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
   }
 }
