@@ -78,11 +78,11 @@ class LoginNotifier extends StateNotifier<LoginState> {
         password:  password,
         agenciaId: agencia.agCodigo,
       );
-      sessionNotifier.setSession(AppSession(
+      await sessionNotifier.setSession(AppSession(
         usCodigo:      user.usCodigo,
         usNombre:      user.usNombre,
         usLogin:       user.usLogin,
-        usPassword:    user.usPassword,
+        usPassword:    password, // plain text for startup re-validation
         puModulo:      user.puModulo ?? '',
         agenciaId:     agencia.agCodigo,
         agenciaNombre: agencia.agNombre,

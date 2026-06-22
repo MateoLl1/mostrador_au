@@ -1,24 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mostrador_au/presentation/providers/session/app_session.dart';
+import 'package:mostrador_au/presentation/providers/session/session_storage.dart';
 
-class AppSession {
-  final int usCodigo;
-  final String usNombre;
-  final String usLogin;
-  final String usPassword;
-  final String puModulo;
-  final int agenciaId;
-  final String agenciaNombre;
-
-  const AppSession({
-    required this.usCodigo,
-    required this.usNombre,
-    required this.usLogin,
-    required this.usPassword,
-    required this.puModulo,
-    required this.agenciaId,
-    required this.agenciaNombre,
-  });
-}
+export 'app_session.dart';
+export 'session_storage.dart';
 
 final appSessionProvider =
     StateNotifierProvider<AppSessionNotifier, AppSession?>((ref) {
@@ -26,11 +11,17 @@ final appSessionProvider =
 });
 
 class AppSessionNotifier extends StateNotifier<AppSession?> {
-  AppSessionNotifier() : super(null);
+  AppSessionNotifier({AppSession? initialSession}) : super(initialSession);
 
-  void setSession(AppSession session) => state = session;
+  Future<void> setSession(AppSession session) async {
+    state = session;
+    await SessionStorage.save(session);
+  }
 
-  void clearSession() => state = null;
+  Future<void> clearSession() async {
+    state = null;
+    await SessionStorage.delete();
+  }
 
   bool get hasSession => state != null;
 }

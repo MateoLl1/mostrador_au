@@ -14,15 +14,28 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSession());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _validateSession());
   }
 
-  void _checkSession() {
+  Future<void> _validateSession() async {
     final session = ref.read(appSessionProvider);
-    if (session != null) {
-      context.go('/mostrador');
-    } else {
+
+    if (session == null) {
       context.go('/login');
+      return;
+    }
+
+    try {
+      await ref.read(authRepositoryProvider).login(
+            login: session.usLogin,
+            password: session.usPassword,
+            agenciaId: session.agenciaId,
+          );
+      if (mounted) context.go('/mostrador');
+    } catch (_) {
+      // Credenciales inválidas o usuario bloqueado/inactivo
+      await ref.read(appSessionProvider.notifier).clearSession();
+      if (mounted) context.go('/login');
     }
   }
 
@@ -36,8 +49,16 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.storefront_rounded, size: 72, color: colors.primary),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             CircularProgressIndicator(color: colors.primary),
+            const SizedBox(height: 16),
+            Text(
+              'Verificando sesión...',
+              style: TextStyle(
+                fontSize: 13,
+                color: colors.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
           ],
         ),
       ),
