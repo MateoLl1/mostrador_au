@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
-import 'package:mostrador_au/presentation/screens/painters/home3_painter.dart';
 import 'package:mostrador_au/presentation/widgets/widgets.dart';
+import 'package:mostrador_au/presentation/screens/painters/home3_painter.dart';
 
 class MostradorScreen extends ConsumerWidget {
   const MostradorScreen({super.key});

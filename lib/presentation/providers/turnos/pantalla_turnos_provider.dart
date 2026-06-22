@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mostrador_au/domain/domain.dart';
-import 'package:mostrador_au/presentation/providers/repositories/repositories.dart';
-import 'package:mostrador_au/presentation/providers/session/session.dart';
+import 'package:mostrador_au/presentation/providers/providers.dart';
 
 final pantallaTurnosProvider = StateNotifierProvider.autoDispose<
     PantallaTurnosNotifier, AsyncValue<PantallaTurnosResponse>>((ref) {

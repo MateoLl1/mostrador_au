@@ -1,24 +1,36 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AppSession {
-  final int? agenciaId;
-  final String? agenciaNombre;
+  final int usCodigo;
+  final String usNombre;
+  final String usLogin;
+  final String usPassword;
+  final String puModulo;
+  final int agenciaId;
+  final String agenciaNombre;
 
-  const AppSession({this.agenciaId, this.agenciaNombre});
+  const AppSession({
+    required this.usCodigo,
+    required this.usNombre,
+    required this.usLogin,
+    required this.usPassword,
+    required this.puModulo,
+    required this.agenciaId,
+    required this.agenciaNombre,
+  });
 }
 
-final appSessionProvider = StateNotifierProvider<AppSessionNotifier, AppSession?>((ref) {
+final appSessionProvider =
+    StateNotifierProvider<AppSessionNotifier, AppSession?>((ref) {
   return AppSessionNotifier();
 });
 
 class AppSessionNotifier extends StateNotifier<AppSession?> {
   AppSessionNotifier() : super(null);
 
-  void setSession({required int agenciaId, String? agenciaNombre}) {
-    state = AppSession(agenciaId: agenciaId, agenciaNombre: agenciaNombre);
-  }
+  void setSession(AppSession session) => state = session;
 
   void clearSession() => state = null;
 
-  bool get hasSession => state?.agenciaId != null;
+  bool get hasSession => state != null;
 }

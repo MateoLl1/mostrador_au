@@ -1,4 +1,6 @@
 export 'entities/entities.dart';
 export 'response/response.dart';
-export 'datasources/datasources.dart';
-export 'repositories/repositories.dart';
+export './datasources/auth_datasource.dart';
+export './datasources/mostrador_datasource.dart';
+export './repositories/auth_repository.dart';
+export './repositories/mostrador_repository.dart';
