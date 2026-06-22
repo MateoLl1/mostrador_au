@@ -238,7 +238,7 @@ class _AgencySelector extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         DropdownButtonFormField<Agencia>(
-          value: selected,
+          initialValue: selected,
           decoration: const InputDecoration(
             labelText: 'Agencia',
             prefixIcon: Icon(Icons.business_rounded),

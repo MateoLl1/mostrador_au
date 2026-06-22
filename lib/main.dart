@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mostrador_au/config/config.dart';
 import 'package:mostrador_au/config/router/app_router.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
 
