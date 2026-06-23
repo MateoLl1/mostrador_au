@@ -11,6 +11,7 @@ class MostradorScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final pantallaState = ref.watch(pantallaTurnosProvider);
+    final isActivo = ref.watch(disponibilidadProvider).isActivo;
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -43,6 +44,7 @@ class MostradorScreen extends ConsumerWidget {
                           flex: 7,
                           child: CurrentTurnCard(
                             turnoActual: data.turnoActual,
+                            isActivo: isActivo,
                             onLlamarSiguiente: () => ref
                                 .read(pantallaTurnosProvider.notifier)
                                 .llamarSiguiente(),

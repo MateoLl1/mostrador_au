@@ -12,6 +12,7 @@ class MostradorHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
     final session = ref.watch(appSessionProvider);
+    final dispState = ref.watch(disponibilidadProvider);
 
     return Stack(
       alignment: Alignment.center,
@@ -25,22 +26,33 @@ class MostradorHeader extends ConsumerWidget {
               ),
         ),
 
-        // Botón de sesión — izquierda
+        // Botones izquierda — sesión + toggle disponibilidad
         Align(
           alignment: Alignment.centerLeft,
-          child: IconButton(
-            tooltip: session?.usNombre ?? 'Sesión',
-            style: IconButton.styleFrom(
-              backgroundColor:
-                  colors.surfaceContainerHighest.withValues(alpha: .45),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                    color: colors.outlineVariant.withValues(alpha: .45)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: session?.usNombre ?? 'Sesión',
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      colors.surfaceContainerHighest.withValues(alpha: .45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                        color: colors.outlineVariant.withValues(alpha: .45)),
+                  ),
+                ),
+                icon: Icon(Icons.person_rounded, color: colors.primary),
+                onPressed: () =>
+                    _showSessionSheet(context, ref, colors, session),
               ),
-            ),
-            icon: Icon(Icons.person_rounded, color: colors.primary),
-            onPressed: () => _showSessionSheet(context, ref, colors, session),
+              const SizedBox(width: 8),
+              _ToggleDisponibilidadButton(state: dispState, colors: colors,
+                onToggle: () =>
+                    ref.read(disponibilidadProvider.notifier).toggle(),
+              ),
+            ],
           ),
         ),
 
@@ -242,6 +254,80 @@ class _InfoTile extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Toggle disponibilidad ─────────────────────────────────────────────────────
+
+class _ToggleDisponibilidadButton extends StatelessWidget {
+  final DisponibilidadState state;
+  final ColorScheme colors;
+  final VoidCallback onToggle;
+
+  const _ToggleDisponibilidadButton({
+    required this.state,
+    required this.colors,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isActivo = state.isActivo;
+    final isLoading = state.isLoading;
+
+    final bgColor = isActivo
+        ? colors.primaryContainer
+        : colors.surfaceContainerHighest.withValues(alpha: .45);
+    final iconColor = isActivo ? colors.primary : colors.onSurfaceVariant;
+    final borderColor = isActivo
+        ? colors.primary.withValues(alpha: .40)
+        : colors.outlineVariant.withValues(alpha: .45);
+
+    return Tooltip(
+      message: isActivo ? 'Activo — toca para desactivar' : 'Inactivo — toca para activar',
+      child: InkWell(
+        onTap: isLoading ? null : onToggle,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: borderColor),
+          ),
+          child: isLoading
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: iconColor,
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isActivo
+                          ? Icons.wifi_rounded
+                          : Icons.wifi_off_rounded,
+                      size: 18,
+                      color: iconColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      isActivo ? 'Activo' : 'Inactivo',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: iconColor,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

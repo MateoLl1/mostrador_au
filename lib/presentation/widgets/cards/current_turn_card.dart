@@ -5,6 +5,7 @@ import 'package:mostrador_au/presentation/widgets/shared/panel.dart';
 
 class CurrentTurnCard extends StatelessWidget {
   final Turno? turnoActual;
+  final bool isActivo;
   final VoidCallback onLlamarSiguiente;
   final VoidCallback onRellamar;
   final VoidCallback onAtender;
@@ -13,6 +14,7 @@ class CurrentTurnCard extends StatelessWidget {
   const CurrentTurnCard({
     super.key,
     required this.turnoActual,
+    required this.isActivo,
     required this.onLlamarSiguiente,
     required this.onRellamar,
     required this.onAtender,
@@ -22,7 +24,7 @@ class CurrentTurnCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final tieneTurno = turnoActual != null;
+    final tieneTurno = turnoActual != null && isActivo;
     final turnoTexto = turnoActual?.turno.trim().isNotEmpty == true
         ? turnoActual!.turno.trim()
         : '-';
@@ -82,7 +84,9 @@ class CurrentTurnCard extends StatelessWidget {
                         icon: Icons.phone_in_talk_rounded,
                         background: colors.primary,
                         foreground: colors.onPrimary,
-                        onPressed: tieneTurno ? null : onLlamarSiguiente,
+                        onPressed: isActivo && !tieneTurno
+                            ? onLlamarSiguiente
+                            : null,
                       ),
                     ),
                     const SizedBox(width: 12),
