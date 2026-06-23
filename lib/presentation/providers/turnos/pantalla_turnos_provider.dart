@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mostrador_au/config/config.dart';
 import 'package:mostrador_au/domain/domain.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
 
@@ -24,6 +25,7 @@ class PantallaTurnosNotifier
   final int? agenciaId;
   Timer? _timer;
   bool _procesando = false;
+  int _prevPendientes = -1;
 
   PantallaTurnosNotifier({
     required this.repository,
@@ -40,6 +42,11 @@ class PantallaTurnosNotifier
     }
     try {
       final response = await repository.getPantallaTurnos(agenciaId!);
+      if (_prevPendientes >= 0 &&
+          response.turnosPendientes.length > _prevPendientes) {
+        TaskbarService.instance.flashIfUnfocused();
+      }
+      _prevPendientes = response.turnosPendientes.length;
       state = AsyncData(response);
     } catch (e, s) {
       state = AsyncError(e, s);
