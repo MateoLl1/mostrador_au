@@ -52,6 +52,9 @@ class MostradorScreen extends ConsumerWidget {
                             onAtender: () => ref
                                 .read(pantallaTurnosProvider.notifier)
                                 .atenderActual(),
+                            onSaltar: () => ref
+                                .read(pantallaTurnosProvider.notifier)
+                                .cancelarActual(),
                           ),
                         ),
                         const SizedBox(width: 24),

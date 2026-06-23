@@ -95,6 +95,24 @@ class PantallaTurnosNotifier
     }
   }
 
+  Future<void> cancelarActual() async {
+    if (_procesando) return;
+    final turnoActual = state.asData?.value.turnoActual;
+    if (turnoActual == null || turnoActual.asgCodigo <= 0) {
+      state = AsyncError('No existe un turno actual para cancelar', StackTrace.current);
+      return;
+    }
+    _procesando = true;
+    try {
+      await repository.cancelarTurno(asgCodigo: turnoActual.asgCodigo);
+      await loadPantalla();
+    } catch (e, s) {
+      state = AsyncError(e, s);
+    } finally {
+      _procesando = false;
+    }
+  }
+
   void _startAutoRefresh() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 10), (_) => loadPantalla());

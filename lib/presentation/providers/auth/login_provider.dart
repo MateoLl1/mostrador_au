@@ -78,6 +78,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         password:  password,
         agenciaId: agencia.agCodigo,
       );
+      state = state.copyWith(submitLoading: false);
       await sessionNotifier.setSession(AppSession(
         usCodigo:      user.usCodigo,
         usNombre:      user.usNombre,

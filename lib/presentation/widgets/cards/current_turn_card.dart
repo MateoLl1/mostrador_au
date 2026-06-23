@@ -8,6 +8,7 @@ class CurrentTurnCard extends StatelessWidget {
   final VoidCallback onLlamarSiguiente;
   final VoidCallback onRellamar;
   final VoidCallback onAtender;
+  final VoidCallback onSaltar;
 
   const CurrentTurnCard({
     super.key,
@@ -15,6 +16,7 @@ class CurrentTurnCard extends StatelessWidget {
     required this.onLlamarSiguiente,
     required this.onRellamar,
     required this.onAtender,
+    required this.onSaltar,
   });
 
   @override
@@ -114,6 +116,7 @@ class CurrentTurnCard extends StatelessWidget {
                         icon: Icons.skip_next_rounded,
                         background: colors.errorContainer,
                         foreground: colors.onErrorContainer,
+                        onPressed: tieneTurno ? onSaltar : null,
                       ),
                     ),
                   ],

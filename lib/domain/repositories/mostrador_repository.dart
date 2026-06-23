@@ -5,4 +5,5 @@ abstract class MostradorRepository {
   Future<TurnoAtencionResponse?> llamarSiguienteTurno({required int agenciaId});
   Future<TurnoAtencionResponse?> rellamarTurno({required int asgCodigo});
   Future<TurnoAtencionResponse?> atenderTurno({required int asgCodigo});
+  Future<TurnoAtencionResponse?> cancelarTurno({required int asgCodigo});
 }
