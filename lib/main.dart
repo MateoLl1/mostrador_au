@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mostrador_au/config/router/app_router.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
-import 'package:mostrador_au/presentation/providers/session/app_session_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
