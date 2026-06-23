@@ -10,7 +10,12 @@ import 'package:mostrador_au/presentation/providers/providers.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  if (!kIsWeb) await windowManager.ensureInitialized();
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.linux)) {
+    await windowManager.ensureInitialized();
+  }
 
   final savedSession = await SessionStorage.load();
 
