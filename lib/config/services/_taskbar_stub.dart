@@ -6,4 +6,7 @@ class TaskbarPlatform implements TaskbarService {
 
   @override
   void flashIfUnfocused() {}
+
+  @override
+  void bringToForeground() {}
 }

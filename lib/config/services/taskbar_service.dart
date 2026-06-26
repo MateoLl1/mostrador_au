@@ -5,4 +5,5 @@ abstract class TaskbarService {
 
   void init();
   void flashIfUnfocused();
+  void bringToForeground();
 }

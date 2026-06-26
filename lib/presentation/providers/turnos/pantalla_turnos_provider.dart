@@ -45,6 +45,7 @@ class PantallaTurnosNotifier
       if (_prevPendientes >= 0 &&
           response.turnosPendientes.length > _prevPendientes) {
         TaskbarService.instance.flashIfUnfocused();
+        TaskbarService.instance.bringToForeground();
       }
       _prevPendientes = response.turnosPendientes.length;
       state = AsyncData(response);
