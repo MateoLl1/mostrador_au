@@ -12,6 +12,7 @@ class MostradorScreen extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final pantallaState = ref.watch(pantallaTurnosProvider);
     final isActivo = ref.watch(disponibilidadProvider).isActivo;
+    final session = ref.watch(appSessionProvider);
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -47,7 +48,7 @@ class MostradorScreen extends ConsumerWidget {
                             isActivo: isActivo,
                             onLlamarSiguiente: () => ref
                                 .read(pantallaTurnosProvider.notifier)
-                                .llamarSiguiente(),
+                                .llamarSiguiente(usCodigo: session?.usCodigo ?? 0),
                             onRellamar: () => ref
                                 .read(pantallaTurnosProvider.notifier)
                                 .rellamarActual(),

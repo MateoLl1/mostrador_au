@@ -54,11 +54,11 @@ class PantallaTurnosNotifier
     }
   }
 
-  Future<void> llamarSiguiente() async {
+  Future<void> llamarSiguiente({required int usCodigo}) async {
     if (_procesando || agenciaId == null) return;
     _procesando = true;
     try {
-      await repository.llamarSiguienteTurno(agenciaId: agenciaId!);
+      await repository.llamarSiguienteTurno(agenciaId: agenciaId!, usCodigo: usCodigo);
       await loadPantalla();
     } catch (e, s) {
       state = AsyncError(e, s);

@@ -25,11 +25,12 @@ class MostradorDatasourceImpl extends MostradorDatasource {
   @override
   Future<TurnoAtencionResponse?> llamarSiguienteTurno({
     required int agenciaId,
+    required int usCodigo,
   }) async {
     try {
       final response = await _dio.post(
         '/turnos/llamar-siguiente',
-        queryParameters: {'agenciaId': agenciaId},
+        queryParameters: {'agenciaId': agenciaId, 'usCodigo': usCodigo},
       );
       if (response.statusCode != 200 || response.data == null) return null;
       return TurnoAtencionResponse.fromJson(

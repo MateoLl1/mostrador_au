@@ -11,8 +11,8 @@ class MostradorRepositoryImpl extends MostradorRepository {
   }
 
   @override
-  Future<TurnoAtencionResponse?> llamarSiguienteTurno({required int agenciaId}) {
-    return datasource.llamarSiguienteTurno(agenciaId: agenciaId);
+  Future<TurnoAtencionResponse?> llamarSiguienteTurno({required int agenciaId, required int usCodigo}) {
+    return datasource.llamarSiguienteTurno(agenciaId: agenciaId, usCodigo: usCodigo);
   }
 
   @override

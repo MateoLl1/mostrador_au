@@ -19,7 +19,7 @@ class DisponibilidadDatasourceImpl extends DisponibilidadDatasource {
   }) async {
     try {
       final response = await _dio.get(
-        '/mostradorDisponibilidad/estado',
+        '/mostrador/disponibilidad/estado',
         queryParameters: {
           'usCodigo': usCodigo,
           'agenciaId': agenciaId,
@@ -42,7 +42,7 @@ class DisponibilidadDatasourceImpl extends DisponibilidadDatasource {
   }) async {
     try {
       final response = await _dio.post(
-        '/mostradorDisponibilidad/toggle',
+        '/mostrador/disponibilidad/toggle',
         data: {
           'usCodigo': usCodigo,
           'agenciaId': agenciaId,
