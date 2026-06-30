@@ -103,6 +103,7 @@ class MostradorHeader extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.surface,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -119,96 +120,129 @@ class _SessionSheet extends StatelessWidget {
 
   const _SessionSheet({required this.session, required this.ref});
 
+  String _nombreGrupo(int? grCodigo) {
+    switch (grCodigo) {
+      case 5:  return 'Mostrador';
+      case 9:  return 'Servicio';
+      case 11: return 'Sistemas';
+      default: return grCodigo != null ? grCodigo.toString() : '—';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colors.outlineVariant,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-        
-            // Avatar
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: colors.primaryContainer,
-              child: Icon(Icons.person_rounded,
-                  size: 34, color: colors.onPrimaryContainer),
-            ),
-            const SizedBox(height: 12),
-        
-            Text(
-              session?.usNombre ?? '—',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: colors.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '@${session?.usLogin ?? '—'}',
-              style: TextStyle(
-                fontSize: 13,
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 20),
-        
-            // Info tiles
-            _InfoTile(
-              colors: colors,
-              icon: Icons.business_rounded,
-              label: 'Agencia',
-              value: session?.agenciaNombre ?? '—',
-            ),
-            const SizedBox(height: 10),
-            _InfoTile(
-              colors: colors,
-              icon: Icons.grid_view_rounded,
-              label: 'Módulo',
-              value: session?.puModulo?.isNotEmpty == true
-                  ? session!.puModulo
-                  : 'Sin módulo',
-            ),
-            const SizedBox(height: 28),
-        
-            // Cerrar sesión
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await ref.read(appSessionProvider.notifier).clearSession();
-                  if (context.mounted) context.go('/login');
-                },
-                icon: const Icon(Icons.logout_rounded),
-                label: const Text('Cerrar sesión'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.error,
-                  side: BorderSide(color: colors.error.withValues(alpha: .5)),
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Scrollable content
+        Flexible(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
                   ),
+                ),
+                const SizedBox(height: 24),
+
+                // Avatar
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: colors.primaryContainer,
+                  child: Icon(Icons.person_rounded,
+                      size: 34, color: colors.onPrimaryContainer),
+                ),
+                const SizedBox(height: 12),
+
+                Text(
+                  session?.usNombre ?? '—',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: colors.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '@${session?.usLogin ?? '—'}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Info tiles
+                _InfoTile(
+                  colors: colors,
+                  icon: Icons.tag_rounded,
+                  label: 'Código usuario',
+                  value: session?.usCodigo?.toString() ?? '—',
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  colors: colors,
+                  icon: Icons.business_rounded,
+                  label: 'Agencia',
+                  value: session?.agenciaNombre ?? '—',
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  colors: colors,
+                  icon: Icons.grid_view_rounded,
+                  label: 'Módulo',
+                  value: session?.puModulo?.isNotEmpty == true
+                      ? session!.puModulo
+                      : 'Sin módulo',
+                ),
+                const SizedBox(height: 10),
+                _InfoTile(
+                  colors: colors,
+                  icon: Icons.group_rounded,
+                  label: 'Grupo',
+                  value: _nombreGrupo(session?.grCodigo),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+
+        // Botón siempre visible al fondo
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+              24, 8, 24, 24 + MediaQuery.viewPaddingOf(context).bottom),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await ref.read(appSessionProvider.notifier).clearSession();
+                if (context.mounted) context.go('/login');
+              },
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text('Cerrar sesión'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colors.error,
+                side: BorderSide(color: colors.error.withValues(alpha: .5)),
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
