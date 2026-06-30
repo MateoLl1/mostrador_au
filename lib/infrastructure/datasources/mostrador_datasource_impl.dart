@@ -14,11 +14,11 @@ class MostradorDatasourceImpl extends MostradorDatasource {
   );
 
   @override
-  Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId) async {
-    final response = await _dio.get(
-      '/PantallaTurnos',
-      queryParameters: {'agenciaId': agenciaId},
-    );
+  Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId, {int? usCodigo, String? filtro}) async {
+    final params = <String, dynamic>{'agenciaId': agenciaId};
+    if (usCodigo != null && usCodigo > 0) params['usCodigo'] = usCodigo;
+    if (filtro != null) params['filtro'] = filtro;
+    final response = await _dio.get('/PantallaTurnos', queryParameters: params);
     return PantallaTurnosMapper.fromJson(response.data as Map<String, dynamic>);
   }
 

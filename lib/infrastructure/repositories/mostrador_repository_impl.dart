@@ -6,8 +6,8 @@ class MostradorRepositoryImpl extends MostradorRepository {
   MostradorRepositoryImpl({required this.datasource});
 
   @override
-  Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId) {
-    return datasource.getPantallaTurnos(agenciaId);
+  Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId, {int? usCodigo, String? filtro}) {
+    return datasource.getPantallaTurnos(agenciaId, usCodigo: usCodigo, filtro: filtro);
   }
 
   @override

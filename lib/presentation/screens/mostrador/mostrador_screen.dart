@@ -37,6 +37,10 @@ class MostradorScreen extends ConsumerWidget {
               data: (data) => Column(
                 children: [
                   MostradorHeader(totalEnEspera: data.turnosPendientes.length),
+                  if (session?.grCodigo == 11) ...[
+                    const SizedBox(height: 14),
+                    _FiltroSistemasToggle(),
+                  ],
                   const SizedBox(height: 24),
                   Expanded(
                     child: Row(
@@ -74,6 +78,36 @@ class MostradorScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FiltroSistemasToggle extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filtroActual = ref.watch(filtroSistemasProvider);
+    final colors = Theme.of(context).colorScheme;
+
+    return SegmentedButton<String>(
+      style: SegmentedButton.styleFrom(
+        selectedBackgroundColor: colors.primaryContainer,
+        selectedForegroundColor: colors.onPrimaryContainer,
+      ),
+      segments: const [
+        ButtonSegment(
+          value: 'mostrador',
+          label: Text('Mostrador'),
+          icon: Icon(Icons.storefront_rounded),
+        ),
+        ButtonSegment(
+          value: 'servicio',
+          label: Text('Servicio'),
+          icon: Icon(Icons.build_rounded),
+        ),
+      ],
+      selected: {filtroActual},
+      onSelectionChanged: (selection) =>
+          ref.read(filtroSistemasProvider.notifier).state = selection.first,
     );
   }
 }
