@@ -3,6 +3,7 @@ class LoginResponse {
   final String usNombre;
   final String usLogin;
   final String usPassword;
+  final int? grCodigo;
   final String? puModulo;
 
   const LoginResponse({
@@ -10,6 +11,7 @@ class LoginResponse {
     required this.usNombre,
     required this.usLogin,
     required this.usPassword,
+    this.grCodigo,
     this.puModulo,
   });
 
@@ -19,6 +21,7 @@ class LoginResponse {
       usNombre:   json['usNombre']?.toString() ?? '',
       usLogin:    json['usLogin']?.toString() ?? '',
       usPassword: json['usPassword']?.toString() ?? '',
+      grCodigo:   (json['grCodigo'] as num?)?.toInt(),
       puModulo:   json['puModulo']?.toString(),
     );
   }

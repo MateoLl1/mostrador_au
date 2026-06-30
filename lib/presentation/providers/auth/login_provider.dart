@@ -84,6 +84,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         usNombre:      user.usNombre,
         usLogin:       user.usLogin,
         usPassword:    password, // plain text for startup re-validation
+        grCodigo:      user.grCodigo,
         puModulo:      user.puModulo ?? '',
         agenciaId:     agencia.agCodigo,
         agenciaNombre: agencia.agNombre,
