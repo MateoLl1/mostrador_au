@@ -79,7 +79,7 @@ class PantallaTurnosNotifier
     if (!mounted || _procesando || agenciaId == null) return;
     _procesando = true;
     try {
-      await repository.llamarSiguienteTurno(agenciaId: agenciaId!, usCodigo: usCodigo);
+      await repository.llamarSiguienteTurno(agenciaId: agenciaId!, usCodigo: usCodigo, filtro: filtro);
       await loadPantalla();
     } catch (e, s) {
       if (mounted) state = AsyncError(e, s);

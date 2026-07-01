@@ -55,4 +55,44 @@ class DisponibilidadDatasourceImpl extends DisponibilidadDatasource {
       throw Exception(e.response?.data?['mensaje'] ?? e.message);
     }
   }
+
+  @override
+  Future<DisponibilidadResponse> activar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/mostrador/disponibilidad/activar',
+        data: {
+          'usCodigo': usCodigo,
+          'agenciaId': agenciaId,
+          'gnCodigo': gnCodigo,
+        },
+      );
+      return DisponibilidadResponse.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?['mensaje'] ?? e.message);
+    }
+  }
+
+  @override
+  Future<void> desactivar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  }) async {
+    try {
+      await _dio.post(
+        '/mostrador/disponibilidad/desactivar',
+        data: {
+          'usCodigo': usCodigo,
+          'agenciaId': agenciaId,
+          'gnCodigo': gnCodigo,
+        },
+      );
+    } catch (_) {}
+  }
 }

@@ -4,11 +4,36 @@ import 'package:mostrador_au/presentation/providers/providers.dart';
 import 'package:mostrador_au/presentation/widgets/widgets.dart';
 import 'package:mostrador_au/presentation/screens/painters/home3_painter.dart';
 
-class MostradorScreen extends ConsumerWidget {
+class MostradorScreen extends ConsumerStatefulWidget {
   const MostradorScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MostradorScreen> createState() => _MostradorScreenState();
+}
+
+class _MostradorScreenState extends ConsumerState<MostradorScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    if (lifecycleState == AppLifecycleState.detached) {
+      ref.read(disponibilidadProvider.notifier).desactivar();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final pantallaState = ref.watch(pantallaTurnosProvider);
     final isActivo = ref.watch(disponibilidadProvider).isActivo;

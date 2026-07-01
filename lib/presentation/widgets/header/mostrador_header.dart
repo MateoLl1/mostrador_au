@@ -226,6 +226,7 @@ class _SessionSheet extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () async {
                 Navigator.of(context).pop();
+                await ref.read(disponibilidadProvider.notifier).desactivar();
                 await ref.read(appSessionProvider.notifier).clearSession();
                 if (context.mounted) context.go('/login');
               },

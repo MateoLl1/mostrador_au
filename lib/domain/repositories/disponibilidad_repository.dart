@@ -12,4 +12,16 @@ abstract class DisponibilidadRepository {
     required int agenciaId,
     required int gnCodigo,
   });
+
+  Future<DisponibilidadResponse> activar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  });
+
+  Future<void> desactivar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  });
 }

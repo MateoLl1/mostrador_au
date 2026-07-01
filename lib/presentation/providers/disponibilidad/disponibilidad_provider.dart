@@ -33,26 +33,23 @@ class DisponibilidadNotifier extends StateNotifier<DisponibilidadState> {
 
   DisponibilidadNotifier({required this.repository, required this.session})
       : super(const DisponibilidadState()) {
-    _loadEstado();
+    _activarAutomatico();
   }
 
-  Future<void> _loadEstado() async {
+  Future<void> _activarAutomatico() async {
     if (session == null) {
       state = state.copyWith(isLoading: false);
       return;
     }
     try {
-      final response = await repository.getEstado(
+      final response = await repository.activar(
         usCodigo: session!.usCodigo,
         agenciaId: session!.agenciaId,
         gnCodigo: _gnCodigoMostrador,
       );
-      state = state.copyWith(
-        isActivo: response?.isActivo ?? false,
-        isLoading: false,
-      );
+      if (mounted) state = state.copyWith(isActivo: response.isActivo, isLoading: false);
     } catch (_) {
-      state = state.copyWith(isLoading: false);
+      if (mounted) state = state.copyWith(isLoading: false);
     }
   }
 
@@ -69,5 +66,17 @@ class DisponibilidadNotifier extends StateNotifier<DisponibilidadState> {
     } catch (_) {
       state = state.copyWith(isLoading: false);
     }
+  }
+
+  Future<void> desactivar() async {
+    if (session == null || !state.isActivo) return;
+    try {
+      await repository.desactivar(
+        usCodigo: session!.usCodigo,
+        agenciaId: session!.agenciaId,
+        gnCodigo: _gnCodigoMostrador,
+      );
+      if (mounted) state = state.copyWith(isActivo: false);
+    } catch (_) {}
   }
 }

@@ -22,4 +22,22 @@ class DisponibilidadRepositoryImpl extends DisponibilidadRepository {
   }) =>
       datasource.toggle(
           usCodigo: usCodigo, agenciaId: agenciaId, gnCodigo: gnCodigo);
+
+  @override
+  Future<DisponibilidadResponse> activar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  }) =>
+      datasource.activar(
+          usCodigo: usCodigo, agenciaId: agenciaId, gnCodigo: gnCodigo);
+
+  @override
+  Future<void> desactivar({
+    required int usCodigo,
+    required int agenciaId,
+    required int gnCodigo,
+  }) =>
+      datasource.desactivar(
+          usCodigo: usCodigo, agenciaId: agenciaId, gnCodigo: gnCodigo);
 }
