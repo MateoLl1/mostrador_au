@@ -28,7 +28,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    ref.read(loginProvider.notifier).login(
+    ref.read(loginProvider.notifier).submit(
           login: _loginCtrl.text.trim(),
           password: _passwordCtrl.text.trim(),
         );
@@ -187,22 +187,17 @@ class _FormCard extends StatelessWidget {
             ),
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(28, 32, 28, 32),
-              child: state.initLoading
-                  ? const SizedBox(
-                      height: 120,
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : _LoginForm(
-                      colors: colors,
-                      state: state,
-                      formKey: formKey,
-                      loginCtrl: loginCtrl,
-                      passwordCtrl: passwordCtrl,
-                      obscurePassword: obscurePassword,
-                      onToggleObscure: onToggleObscure,
-                      onSubmit: onSubmit,
-                      onSelectAgencia: onSelectAgencia,
-                    ),
+              child: _LoginForm(
+                colors: colors,
+                state: state,
+                formKey: formKey,
+                loginCtrl: loginCtrl,
+                passwordCtrl: passwordCtrl,
+                obscurePassword: obscurePassword,
+                onToggleObscure: onToggleObscure,
+                onSubmit: onSubmit,
+                onSelectAgencia: onSelectAgencia,
+              ),
             ),
           ),
         ),
@@ -235,6 +230,8 @@ class _LoginForm extends StatelessWidget {
     required this.onSubmit,
     required this.onSelectAgencia,
   });
+
+  bool get _showAgenciaSelector => state.agencias.length > 1;
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +271,9 @@ class _LoginForm extends StatelessWidget {
             label: 'Contraseña',
             prefixIcon: Icons.lock_outline_rounded,
             obscureText: obscurePassword,
-            textInputAction: TextInputAction.next,
+            textInputAction:
+                _showAgenciaSelector ? TextInputAction.next : TextInputAction.done,
+            onFieldSubmitted: _showAgenciaSelector ? null : (_) => onSubmit(),
             suffixIcon: IconButton(
               icon: Icon(
                 obscurePassword
@@ -287,45 +286,15 @@ class _LoginForm extends StatelessWidget {
             validator: (v) =>
                 v == null || v.trim().isEmpty ? 'Ingresa tu contraseña' : null,
           ),
-          const SizedBox(height: 14),
-          DropdownButtonFormField<Agencia>(
-            initialValue: state.selectedAgencia,
-            decoration: InputDecoration(
-              labelText: 'Agencia',
-              prefixIcon: const Icon(Icons.business_rounded, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    BorderSide(color: colors.outline.withValues(alpha: 0.5)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    BorderSide(color: colors.outline.withValues(alpha: 0.4)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colors.primary, width: 2),
-              ),
-              filled: true,
-              fillColor:
-                  colors.surfaceContainerHighest.withValues(alpha: 0.4),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 14),
+          if (_showAgenciaSelector) ...[
+            const SizedBox(height: 14),
+            _AgenciaSelector(
+              colors: colors,
+              agencias: state.agencias,
+              selectedAgencia: state.selectedAgencia,
+              onSelectAgencia: onSelectAgencia,
             ),
-            borderRadius: BorderRadius.circular(14),
-            items: state.agencias
-                .map((a) => DropdownMenuItem(
-                      value: a,
-                      child: Text(a.agNombre),
-                    ))
-                .toList(),
-            onChanged: (a) {
-              if (a != null) onSelectAgencia(a);
-            },
-            validator: (v) =>
-                v == null ? 'Selecciona una agencia' : null,
-          ),
+          ],
           if (state.errorMessage != null) ...[
             const SizedBox(height: 14),
             Container(
@@ -359,6 +328,81 @@ class _LoginForm extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Agencia selector ──────────────────────────────────────────────────────────
+
+class _AgenciaSelector extends StatelessWidget {
+  final ColorScheme colors;
+  final List<Agencia> agencias;
+  final Agencia? selectedAgencia;
+  final void Function(Agencia) onSelectAgencia;
+
+  const _AgenciaSelector({
+    required this.colors,
+    required this.agencias,
+    required this.selectedAgencia,
+    required this.onSelectAgencia,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.business_rounded, size: 14, color: colors.primary),
+            const SizedBox(width: 6),
+            Text(
+              'Selecciona tu agencia',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colors.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<Agencia>(
+          initialValue: selectedAgencia,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.storefront_rounded, size: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide:
+                  BorderSide(color: colors.outline.withValues(alpha: 0.5)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide:
+                  BorderSide(color: colors.outline.withValues(alpha: 0.4)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: colors.primary, width: 2),
+            ),
+            filled: true,
+            fillColor: colors.surfaceContainerHighest.withValues(alpha: 0.4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+          borderRadius: BorderRadius.circular(14),
+          items: agencias
+              .map((a) => DropdownMenuItem(
+                    value: a,
+                    child: Text(a.agNombre),
+                  ))
+              .toList(),
+          onChanged: (a) {
+            if (a != null) onSelectAgencia(a);
+          },
+          validator: (v) => v == null ? 'Selecciona una agencia' : null,
+        ),
+      ],
     );
   }
 }

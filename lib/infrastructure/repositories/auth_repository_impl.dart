@@ -11,7 +11,7 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<List<Agencia>> getAgencias() {
-    return datasource.getAgencias();
+  Future<List<Agencia>> getAgenciasPorUsuario({required String login, required String password}) {
+    return datasource.getAgenciasPorUsuario(login: login, password: password);
   }
 }

@@ -33,14 +33,25 @@ class AuthDatasourceImpl extends AuthDatasource {
   }
 
   @override
-  Future<List<Agencia>> getAgencias() async {
-    final response = await _dio.get('/agencias');
-    final List<dynamic> data = response.data;
-    return data
-        .map((e) => Agencia(
-              agCodigo: (e['agCodigo'] as num).toInt(),
-              agNombre: e['agNombre']?.toString() ?? '',
-            ))
-        .toList();
+  Future<List<Agencia>> getAgenciasPorUsuario({required String login, required String password}) async {
+    try {
+      final response = await _dio.post(
+        '/auth/agencias',
+        data: {'login': login, 'password': password},
+      );
+      final List<dynamic> data = response.data;
+      return data
+          .map((e) => Agencia(
+                agCodigo: (e['agCodigo'] as num).toInt(),
+                agNombre: e['agNombre']?.toString() ?? '',
+              ))
+          .toList();
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final mensaje = (data is Map && data['mensaje'] != null)
+          ? data['mensaje'].toString()
+          : e.message ?? 'Error al obtener agencias';
+      throw Exception(mensaje);
+    }
   }
 }

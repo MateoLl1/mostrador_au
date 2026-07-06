@@ -8,6 +8,7 @@ class AppTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final void Function(String)? onFieldSubmitted;
 
   const AppTextField({
     super.key,
@@ -18,6 +19,7 @@ class AppTextField extends StatelessWidget {
     this.textInputAction,
     this.suffixIcon,
     this.validator,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -28,6 +30,7 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       textInputAction: textInputAction,
       validator: validator,
+      onFieldSubmitted: onFieldSubmitted,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(prefixIcon, size: 20),
