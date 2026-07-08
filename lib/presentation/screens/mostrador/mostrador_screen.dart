@@ -45,61 +45,97 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
         size: Size.infinite,
         painter: Home3Painter(primaryColor: colors.primary),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 28),
-            child: pantallaState.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Center(
-                child: Text(
-                  error.toString(),
-                  style: TextStyle(
-                    color: colors.error,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 700;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isCompact ? 16 : 44,
+                  vertical: isCompact ? 16 : 28,
                 ),
-              ),
-              data: (data) => Column(
-                children: [
-                  MostradorHeader(totalEnEspera: data.turnosPendientes.length),
-                  if (session?.grCodigo == 11) ...[
-                    const SizedBox(height: 14),
-                    _FiltroSistemasToggle(),
-                  ],
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 7,
-                          child: CurrentTurnCard(
-                            turnoActual: data.turnoActual,
-                            isActivo: isActivo,
-                            onLlamarSiguiente: () => ref
-                                .read(pantallaTurnosProvider.notifier)
-                                .llamarSiguiente(usCodigo: session?.usCodigo ?? 0),
-                            onRellamar: () => ref
-                                .read(pantallaTurnosProvider.notifier)
-                                .rellamarActual(),
-                            onAtender: () => ref
-                                .read(pantallaTurnosProvider.notifier)
-                                .atenderActual(),
-                            onSaltar: () => ref
-                                .read(pantallaTurnosProvider.notifier)
-                                .cancelarActual(),
-                          ),
-                        ),
-                        const SizedBox(width: 24),
-                        Expanded(
-                          flex: 5,
-                          child: QueueCard(pendientes: data.turnosPendientes),
-                        ),
-                      ],
+                child: pantallaState.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => Center(
+                    child: Text(
+                      error.toString(),
+                      style: TextStyle(
+                        color: colors.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ],
-              ),
-            ),
+                  data: (data) {
+                    final header = MostradorHeader(
+                        totalEnEspera: data.turnosPendientes.length);
+                    final filtro = session?.grCodigo == 11
+                        ? _FiltroSistemasToggle()
+                        : null;
+                    final queueCard =
+                        QueueCard(pendientes: data.turnosPendientes);
+                    final currentCard = CurrentTurnCard(
+                      turnoActual: data.turnoActual,
+                      isActivo: isActivo,
+                      onLlamarSiguiente: () => ref
+                          .read(pantallaTurnosProvider.notifier)
+                          .llamarSiguiente(usCodigo: session?.usCodigo ?? 0),
+                      onRellamar: () => ref
+                          .read(pantallaTurnosProvider.notifier)
+                          .rellamarActual(),
+                      onAtender: () => ref
+                          .read(pantallaTurnosProvider.notifier)
+                          .atenderActual(),
+                      onSaltar: () => ref
+                          .read(pantallaTurnosProvider.notifier)
+                          .cancelarActual(),
+                    );
+
+                    if (isCompact) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            header,
+                            if (filtro != null) ...[
+                              const SizedBox(height: 14),
+                              filtro,
+                            ],
+                            const SizedBox(height: 20),
+                            currentCard,
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              height: 380,
+                              child: queueCard,
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        header,
+                        if (filtro != null) ...[
+                          const SizedBox(height: 14),
+                          filtro,
+                        ],
+                        const SizedBox(height: 24),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(flex: 7, child: currentCard),
+                              const SizedBox(width: 24),
+                              Expanded(flex: 5, child: queueCard),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ),
       ),

@@ -18,7 +18,7 @@ class MostradorHeader extends ConsumerWidget {
       alignment: Alignment.center,
       children: [
         Text(
-          'MOSTRADOR • REPUESTOS',
+          'Automotores Continetal',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: colors.onSurface,
                 fontWeight: FontWeight.w900,
