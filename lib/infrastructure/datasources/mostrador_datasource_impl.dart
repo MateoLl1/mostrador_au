@@ -1,17 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:mostrador_au/config/env/app_env.dart';
 import 'package:mostrador_au/domain/domain.dart';
+import 'package:mostrador_au/infrastructure/http/dio_factory.dart';
 import 'package:mostrador_au/infrastructure/mappers/mappers.dart';
 
 class MostradorDatasourceImpl extends MostradorDatasource {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: AppEnv.apiBaseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 20),
-      sendTimeout: const Duration(seconds: 10),
-    ),
-  );
+  final Dio _dio = DioFactory.create();
 
   @override
   Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId, {int? usCodigo, String? filtro}) async {

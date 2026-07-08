@@ -1,15 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:mostrador_au/config/env/app_env.dart';
 import 'package:mostrador_au/domain/domain.dart';
+import 'package:mostrador_au/infrastructure/http/dio_factory.dart';
 
 class DisponibilidadDatasourceImpl extends DisponibilidadDatasource {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: AppEnv.apiBaseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 20),
-    ),
-  );
+  final Dio _dio = DioFactory.create();
 
   @override
   Future<DisponibilidadResponse?> getEstado({
