@@ -71,7 +71,7 @@ class CurrentTurnCard extends StatelessWidget {
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 16),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 38),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 448),
             child: Column(

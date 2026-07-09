@@ -14,80 +14,80 @@ class MostradorHeader extends ConsumerWidget {
     final session = ref.watch(appSessionProvider);
     final dispState = ref.watch(disponibilidadProvider);
 
-    return Stack(
-      alignment: Alignment.center,
+    return Row(
       children: [
-        Text(
-          'Automotores Continetal',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: colors.onSurface,
-                fontWeight: FontWeight.w900,
-                letterSpacing: .5,
+        // Botones izquierda — sesión + toggle disponibilidad
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: session?.usNombre ?? 'Sesión',
+              style: IconButton.styleFrom(
+                backgroundColor:
+                    colors.surfaceContainerHighest.withValues(alpha: .45),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                      color: colors.outlineVariant.withValues(alpha: .45)),
+                ),
               ),
+              icon: Icon(Icons.person_rounded, color: colors.primary),
+              onPressed: () =>
+                  _showSessionSheet(context, ref, colors, session),
+            ),
+            const SizedBox(width: 8),
+            _ToggleDisponibilidadButton(
+              state: dispState,
+              colors: colors,
+              onToggle: () =>
+                  ref.read(disponibilidadProvider.notifier).toggle(),
+            ),
+          ],
         ),
 
-        // Botones izquierda — sesión + toggle disponibilidad
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                tooltip: session?.usNombre ?? 'Sesión',
-                style: IconButton.styleFrom(
-                  backgroundColor:
-                      colors.surfaceContainerHighest.withValues(alpha: .45),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                        color: colors.outlineVariant.withValues(alpha: .45)),
-                  ),
+        // Título — ocupa el espacio restante entre los dos extremos
+        Expanded(
+          child: Text(
+            'Automotores Continental',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: .5,
                 ),
-                icon: Icon(Icons.person_rounded, color: colors.primary),
-                onPressed: () =>
-                    _showSessionSheet(context, ref, colors, session),
-              ),
-              const SizedBox(width: 8),
-              _ToggleDisponibilidadButton(state: dispState, colors: colors,
-                onToggle: () =>
-                    ref.read(disponibilidadProvider.notifier).toggle(),
-              ),
-            ],
           ),
         ),
 
         // Contador en espera — derecha
-        Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: colors.surfaceContainerHighest.withValues(alpha: .45),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                  color: colors.outlineVariant.withValues(alpha: .45)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.groups_rounded, size: 18, color: colors.primary),
-                const SizedBox(width: 8),
-                Text(
-                  totalEnEspera.toString(),
-                  style: TextStyle(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w800,
-                  ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerHighest.withValues(alpha: .45),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: .45)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.groups_rounded, size: 18, color: colors.primary),
+              const SizedBox(width: 8),
+              Text(
+                totalEnEspera.toString(),
+                style: TextStyle(
+                  color: colors.onSurface,
+                  fontWeight: FontWeight.w800,
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  'en espera',
-                  style:
-                      TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'en espera',
+                style:
+                    TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
+              ),
+            ],
           ),
         ),
       ],
