@@ -1,0 +1,35 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Name="Mostrador AU"
+           Manufacturer="Autoconsa"
+           Version="0.1.0.0"
+           UpgradeCode="B89D43CA-B725-4DF7-93D7-D2374C09C585">
+
+    <MajorUpgrade
+      DowngradeErrorMessage="Ya hay instalada una versión más nueva de [ProductName]." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Mostrador AU" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Mostrador AU" />
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="Mostrador AU" Level="1" ConfigurableDirectory="INSTALLFOLDER">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <Feature Id="DesktopShortcutFeature" Title="Acceso directo en el Escritorio"
+             Description="Crea un acceso directo a Mostrador AU en el Escritorio." Level="1">
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="installer\License.rtf" />
+    <ui:WixUI Id="WixUI_FeatureTree" />
+  </Package>
+</Wix>
