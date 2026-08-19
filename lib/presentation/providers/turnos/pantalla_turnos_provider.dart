@@ -124,6 +124,27 @@ class PantallaTurnosNotifier
     }
   }
 
+  Future<void> saltarActual() async {
+    if (!mounted || _procesando) return;
+    final turnoActual = state.asData?.value.turnoActual;
+    if (turnoActual == null || turnoActual.asgCodigo <= 0) {
+      if (mounted) state = AsyncError('No existe un turno actual para saltar', StackTrace.current);
+      return;
+    }
+    _procesando = true;
+    try {
+      await repository.saltarTurno(
+        asgCodigo: turnoActual.asgCodigo,
+        usCodigo: usCodigo ?? 0,
+      );
+      await loadPantalla();
+    } catch (e, s) {
+      if (mounted) state = AsyncError(e, s);
+    } finally {
+      _procesando = false;
+    }
+  }
+
   Future<void> cancelarActual() async {
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;

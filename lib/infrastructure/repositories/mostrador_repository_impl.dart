@@ -29,4 +29,9 @@ class MostradorRepositoryImpl extends MostradorRepository {
   Future<TurnoAtencionResponse?> cancelarTurno({required int asgCodigo}) {
     return datasource.cancelarTurno(asgCodigo: asgCodigo);
   }
+
+  @override
+  Future<TurnoAtencionResponse?> saltarTurno({required int asgCodigo, required int usCodigo}) {
+    return datasource.saltarTurno(asgCodigo: asgCodigo, usCodigo: usCodigo);
+  }
 }

@@ -89,7 +89,7 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
                           .atenderActual(),
                       onSaltar: () => ref
                           .read(pantallaTurnosProvider.notifier)
-                          .cancelarActual(),
+                          .saltarActual(),
                     );
 
                     if (isCompact) {
