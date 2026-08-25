@@ -7,4 +7,5 @@ abstract class MostradorRepository {
   Future<TurnoAtencionResponse?> atenderTurno({required int asgCodigo});
   Future<TurnoAtencionResponse?> cancelarTurno({required int asgCodigo});
   Future<TurnoAtencionResponse?> saltarTurno({required int asgCodigo, required int usCodigo});
+  Future<TurnoAtencionResponse?> llamarTurnoEspecifico({required int asgCodigo, required int usCodigo});
 }

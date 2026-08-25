@@ -73,6 +73,25 @@ class MostradorDatasourceImpl extends MostradorDatasource {
   }
 
   @override
+  Future<TurnoAtencionResponse?> llamarTurnoEspecifico({required int asgCodigo, required int usCodigo}) async {
+    try {
+      final response = await _dio.post(
+        '/turnos/$asgCodigo/llamar',
+        queryParameters: {'usCodigo': usCodigo},
+      );
+      if (response.statusCode != 200 || response.data == null) return null;
+      return TurnoAtencionResponse.fromJson(
+        Map<String, dynamic>.from(response.data),
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      throw Exception(
+        e.response?.data?.toString() ?? e.message ?? 'Error llamando turno',
+      );
+    }
+  }
+
+  @override
   Future<TurnoAtencionResponse?> saltarTurno({required int asgCodigo, required int usCodigo}) async {
     try {
       final response = await _dio.post(

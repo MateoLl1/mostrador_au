@@ -73,8 +73,27 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
                     final filtro = session?.grCodigo == 11
                         ? _FiltroSistemasToggle()
                         : null;
-                    final queueCard =
-                        QueueCard(pendientes: data.turnosPendientes);
+                    final flotas = data.turnosPendientes
+                        .where((t) => t.tipo == 'flota')
+                        .toList();
+                    final resto = data.turnosPendientes
+                        .where((t) => t.tipo != 'flota')
+                        .toList();
+                    final siguienteAsg = resto.isNotEmpty
+                        ? resto.first.asgCodigo
+                        : null;
+                    final flotaCard = QueueCard(
+                      pendientes: flotas,
+                      titulo: 'Flotas',
+                      textoVacio: 'Sin turnos de flota',
+                      onTapTurno: (t) => ref
+                          .read(pantallaTurnosProvider.notifier)
+                          .llamarTurno(asgCodigo: t.asgCodigo),
+                    );
+                    final queueCard = QueueCard(
+                      pendientes: resto,
+                      siguienteAsgCodigo: siguienteAsg,
+                    );
                     final currentCard = CurrentTurnCard(
                       turnoActual: data.turnoActual,
                       isActivo: isActivo,
@@ -105,6 +124,11 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
                             currentCard,
                             const SizedBox(height: 16),
                             SizedBox(
+                              height: 200,
+                              child: flotaCard,
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
                               height: 380,
                               child: queueCard,
                             ),
@@ -126,7 +150,16 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
                             children: [
                               Expanded(flex: 7, child: currentCard),
                               const SizedBox(width: 24),
-                              Expanded(flex: 5, child: queueCard),
+                              Expanded(
+                                flex: 5,
+                                child: Column(
+                                  children: [
+                                    Expanded(flex: 2, child: flotaCard),
+                                    const SizedBox(height: 16),
+                                    Expanded(flex: 3, child: queueCard),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),

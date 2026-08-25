@@ -9,6 +9,7 @@ class Turno {
   final bool esTurnoActual;
   final String nombreCliente;
   final DateTime? fechaReferencia;
+  final String canal;
 
   Turno({
     required this.asgCodigo,
@@ -21,5 +22,6 @@ class Turno {
     required this.esTurnoActual,
     required this.nombreCliente,
     required this.fechaReferencia,
+    this.canal = 'R',
   });
 }

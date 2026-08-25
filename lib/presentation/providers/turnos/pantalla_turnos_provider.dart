@@ -124,6 +124,22 @@ class PantallaTurnosNotifier
     }
   }
 
+  Future<void> llamarTurno({required int asgCodigo}) async {
+    if (!mounted || _procesando) return;
+    _procesando = true;
+    try {
+      await repository.llamarTurnoEspecifico(
+        asgCodigo: asgCodigo,
+        usCodigo: usCodigo ?? 0,
+      );
+      await loadPantalla();
+    } catch (e, s) {
+      if (mounted) state = AsyncError(e, s);
+    } finally {
+      _procesando = false;
+    }
+  }
+
   Future<void> saltarActual() async {
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;

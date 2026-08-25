@@ -4,13 +4,26 @@ class QueueItem extends StatelessWidget {
   final String code;
   final String name;
   final bool isNext;
+  final String? canal;
 
   const QueueItem({
     super.key,
     required this.code,
     required this.name,
     this.isNext = false,
+    this.canal,
   });
+
+  Color _canalColor(ColorScheme colors) {
+    switch (canal) {
+      case 'F':
+        return const Color(0xFF7C3AED);
+      case 'P':
+        return const Color(0xFFD97706);
+      default:
+        return colors.primary;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +53,29 @@ class QueueItem extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
+          if (canal != null && canal!.isNotEmpty) ...[
+            const SizedBox(width: 8),
+            Container(
+              width: 22,
+              height: 22,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: _canalColor(colors).withValues(alpha: .15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: _canalColor(colors).withValues(alpha: .55),
+                ),
+              ),
+              child: Text(
+                canal!,
+                style: TextStyle(
+                  color: _canalColor(colors),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(width: 18),
           Expanded(
             child: Text(

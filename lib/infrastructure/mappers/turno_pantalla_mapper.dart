@@ -15,6 +15,7 @@ class TurnoPantallaMapper {
       fechaReferencia: json['fechaReferencia'] != null
           ? DateTime.tryParse(json['fechaReferencia'].toString())
           : null,
+      canal: json['canal']?.toString() ?? 'R',
     );
   }
 }

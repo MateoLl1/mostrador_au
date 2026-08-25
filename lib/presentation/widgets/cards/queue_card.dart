@@ -5,8 +5,19 @@ import 'package:mostrador_au/presentation/widgets/shared/panel.dart';
 
 class QueueCard extends StatelessWidget {
   final List<Turno> pendientes;
+  final String titulo;
+  final String textoVacio;
+  final int? siguienteAsgCodigo;
+  final void Function(Turno turno)? onTapTurno;
 
-  const QueueCard({super.key, required this.pendientes});
+  const QueueCard({
+    super.key,
+    required this.pendientes,
+    this.titulo = 'En espera',
+    this.textoVacio = 'Sin turnos en espera',
+    this.siguienteAsgCodigo,
+    this.onTapTurno,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +32,7 @@ class QueueCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'En espera',
+                  titulo,
                   style: TextStyle(
                     color: colors.onSurface,
                     fontSize: 17,
@@ -40,7 +51,7 @@ class QueueCard extends StatelessWidget {
             child: pendientes.isEmpty
                 ? Center(
                     child: Text(
-                      'Sin turnos en espera',
+                      textoVacio,
                       style: TextStyle(
                         color: colors.onSurfaceVariant,
                         fontSize: 14,
@@ -52,12 +63,19 @@ class QueueCard extends StatelessWidget {
                     separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = pendientes[index];
-                      return QueueItem(
+                      final queueItem = QueueItem(
                         code: item.turno,
                         name: item.nombreCliente.trim().isEmpty
                             ? 'Cliente sin nombre'
                             : item.nombreCliente.trim(),
-                        isNext: index == 0,
+                        isNext: item.asgCodigo == siguienteAsgCodigo,
+                        canal: item.canal,
+                      );
+                      if (onTapTurno == null) return queueItem;
+                      return InkWell(
+                        onTap: () => onTapTurno!(item),
+                        borderRadius: BorderRadius.circular(12),
+                        child: queueItem,
                       );
                     },
                   ),
