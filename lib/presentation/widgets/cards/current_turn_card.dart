@@ -106,7 +106,7 @@ class CurrentTurnCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: ActionButton(
-                        text: 'Atender',
+                        text: 'Finalizado',
                         icon: Icons.check_circle_outline_rounded,
                         background: colors.tertiaryContainer,
                         foreground: colors.onTertiaryContainer,
