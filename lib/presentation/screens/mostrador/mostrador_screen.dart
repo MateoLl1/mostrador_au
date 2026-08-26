@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mostrador_au/config/services/actualizador_service.dart';
+import 'package:mostrador_au/config/services/taskbar_service.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
 import 'package:mostrador_au/presentation/widgets/widgets.dart';
 import 'package:mostrador_au/presentation/screens/painters/home3_painter.dart';
@@ -43,6 +44,9 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
 
     final actualizacion = await ActualizadorService.buscarActualizacion();
     if (actualizacion == null || !mounted) return;
+
+    TaskbarService.instance.flashIfUnfocused();
+    TaskbarService.instance.bringToForeground();
 
     _dialogoActualizacionAbierto = true;
 

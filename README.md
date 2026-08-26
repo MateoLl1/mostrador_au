@@ -57,9 +57,9 @@ Dos archivos, deben quedar coherentes entre sí:
   ```
   (`X.Y.Z` es la versión visible; el `+N` es el build number de Flutter, súbelo también aunque no lo lea el actualizador.)
 
-- **`installer/Package.wxs`**, atributo `Version` del `<Package>`
+- **`installer/Package.wxs`**, atributo `Version` del `<Package>` — mismo número que el pubspec, 3 dígitos alcanzan (Windows Installer solo usa Major.Minor.Build para decidir actualizaciones)
   ```xml
-  Version="0.1.2.0"
+  Version="0.1.2"
   ```
 
 ### 2. Compilar el release de Windows
