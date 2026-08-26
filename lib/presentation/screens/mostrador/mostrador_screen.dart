@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mostrador_au/config/services/actualizador_service.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
 import 'package:mostrador_au/presentation/widgets/widgets.dart';
 import 'package:mostrador_au/presentation/screens/painters/home3_painter.dart';
@@ -13,16 +16,103 @@ class MostradorScreen extends ConsumerStatefulWidget {
 
 class _MostradorScreenState extends ConsumerState<MostradorScreen>
     with WidgetsBindingObserver {
+  Timer? _actualizacionTimer;
+  bool _dialogoActualizacionAbierto = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _verificarActualizacion());
+    _actualizacionTimer = Timer.periodic(
+      const Duration(hours: 4),
+      (_) => _verificarActualizacion(),
+    );
   }
 
   @override
   void dispose() {
+    _actualizacionTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _verificarActualizacion() async {
+    if (_dialogoActualizacionAbierto) return;
+
+    final actualizacion = await ActualizadorService.buscarActualizacion();
+    if (actualizacion == null || !mounted) return;
+
+    _dialogoActualizacionAbierto = true;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        var descargando = false;
+        String? error;
+
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setStateDialog) => AlertDialog(
+              title: const Text('Actualización disponible'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Hay una nueva versión del mostrador (${actualizacion.version}). '
+                    'Debes actualizar para continuar.',
+                  ),
+                  if (descargando) ...[
+                    const SizedBox(height: 18),
+                    const LinearProgressIndicator(),
+                    const SizedBox(height: 8),
+                    const Text('Descargando actualización...'),
+                  ],
+                  if (error != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      error!,
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                if (!descargando)
+                  FilledButton.icon(
+                    icon: const Icon(Icons.system_update_alt),
+                    label: const Text('Actualizar ahora'),
+                    onPressed: () async {
+                      setStateDialog(() {
+                        descargando = true;
+                        error = null;
+                      });
+
+                      try {
+                        await ActualizadorService.descargarEInstalar(
+                          actualizacion.url,
+                          actualizacion.version,
+                        );
+                      } catch (_) {
+                        setStateDialog(() {
+                          descargando = false;
+                          error = 'No se pudo descargar la actualización. '
+                              'Verifica tu conexión e inténtalo de nuevo.';
+                        });
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    _dialogoActualizacionAbierto = false;
   }
 
   @override
