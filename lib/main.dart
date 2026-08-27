@@ -43,7 +43,9 @@ class MainApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Mostrador AU',
       debugShowCheckedModeBanner: false,
-      theme: appTheme.theme(),
+      theme: appTheme.theme(
+        
+      ),
       routerConfig: appRouter,
     );
   }

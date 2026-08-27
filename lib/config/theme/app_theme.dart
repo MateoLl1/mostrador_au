@@ -15,7 +15,7 @@ class AppTheme {
   final bool isDarkMode;
 
   const AppTheme({
-    this.selectedColor = 0,
+    this.selectedColor = 2,
     this.isDarkMode = false,
   }) : assert(selectedColor >= 0 && selectedColor < colorList.length);
 

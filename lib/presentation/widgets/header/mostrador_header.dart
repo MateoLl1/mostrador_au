@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mostrador_au/presentation/providers/providers.dart';
+import 'package:mostrador_au/presentation/widgets/shared/app_version_text.dart';
 
 class MostradorHeader extends ConsumerWidget {
   final int totalEnEspera;
@@ -212,6 +213,8 @@ class _SessionSheet extends StatelessWidget {
                   value: _nombreGrupo(session?.grCodigo),
                 ),
                 const SizedBox(height: 16),
+                const AppVersionText(),
+                const SizedBox(height: 4),
               ],
             ),
           ),

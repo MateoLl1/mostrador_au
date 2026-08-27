@@ -326,6 +326,8 @@ class _LoginForm extends StatelessWidget {
             isLoading: state.submitLoading,
             onPressed: onSubmit,
           ),
+          const SizedBox(height: 16),
+          const Center(child: AppVersionText()),
         ],
       ),
     );

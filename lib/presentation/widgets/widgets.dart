@@ -1,4 +1,5 @@
 export 'shared/panel.dart';
+export 'shared/app_version_text.dart';
 export 'buttons/action_button.dart';
 export 'buttons/primary_button.dart';
 export 'inputs/app_text_field.dart';
