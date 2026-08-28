@@ -12,12 +12,16 @@ class TurnoPantallaMapper {
       requiereCambioEstado: json['requiereCambioEstado'] == true,
       esTurnoActual: json['esTurnoActual'] == true,
       nombreCliente: json['nombreCliente']?.toString() ?? '',
-      fechaReferencia: json['fechaReferencia'] != null
-          ? DateTime.tryParse(json['fechaReferencia'].toString())
-          : null,
+      fechaReferencia: _fecha(json['fechaReferencia']),
       canal: json['canal']?.toString() ?? 'R',
+      fechaCita: _fecha(json['fechaCita']),
+      fechaLlegada: _fecha(json['fechaLlegada']),
+      fechaOrden: _fecha(json['fechaOrden']),
     );
   }
+
+  static DateTime? _fecha(dynamic valor) =>
+      valor == null ? null : DateTime.tryParse(valor.toString());
 }
 
 class PantallaTurnosMapper {

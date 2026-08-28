@@ -6,13 +6,35 @@ class QueueItem extends StatelessWidget {
   final bool isNext;
   final String? canal;
 
+  /// Fechas de diagnóstico de la cola. Solo llegan con datos para Sistemas.
+  final DateTime? fechaCita;
+  final DateTime? fechaLlegada;
+  final DateTime? fechaOrden;
+
   const QueueItem({
     super.key,
     required this.code,
     required this.name,
     this.isNext = false,
     this.canal,
+    this.fechaCita,
+    this.fechaLlegada,
+    this.fechaOrden,
   });
+
+  static String _hora(DateTime fecha) =>
+      '${fecha.hour.toString().padLeft(2, '0')}:'
+      '${fecha.minute.toString().padLeft(2, '0')}';
+
+  /// "Cita 08:00 · Llegó 09:49". La cita solo aparece si el turno la tiene.
+  String? get _diagnostico {
+    final partes = <String>[
+      if (fechaCita != null) 'Cita ${_hora(fechaCita!)}',
+      if (fechaLlegada != null) 'Llegó ${_hora(fechaLlegada!)}',
+    ];
+
+    return partes.isEmpty ? null : partes.join('  ·  ');
+  }
 
   Color _canalColor(ColorScheme colors) {
     switch (canal) {
@@ -28,10 +50,11 @@ class QueueItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final diagnostico = _diagnostico;
 
     return Container(
-      height: 62,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      constraints: BoxConstraints(minHeight: diagnostico == null ? 62 : 70),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isNext
             ? colors.primaryContainer.withValues(alpha: .35)
@@ -78,13 +101,34 @@ class QueueItem extends StatelessWidget {
           ],
           const SizedBox(width: 18),
           Expanded(
-            child: Text(
-              name,
-              style: TextStyle(
-                color: colors.onSurface,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (diagnostico != null) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    diagnostico,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: colors.onSurfaceVariant,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           if (isNext)

@@ -11,6 +11,12 @@ class Turno {
   final DateTime? fechaReferencia;
   final String canal;
 
+  /// Diagnóstico de la cola. La API solo las envía a usuarios de Sistemas;
+  /// para el resto llegan nulas.
+  final DateTime? fechaCita;
+  final DateTime? fechaLlegada;
+  final DateTime? fechaOrden;
+
   Turno({
     required this.asgCodigo,
     required this.turno,
@@ -23,5 +29,8 @@ class Turno {
     required this.nombreCliente,
     required this.fechaReferencia,
     this.canal = 'R',
+    this.fechaCita,
+    this.fechaLlegada,
+    this.fechaOrden,
   });
 }

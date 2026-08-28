@@ -70,6 +70,9 @@ class QueueCard extends StatelessWidget {
                             : item.nombreCliente.trim(),
                         isNext: item.asgCodigo == siguienteAsgCodigo,
                         canal: item.canal,
+                        fechaCita: item.fechaCita,
+                        fechaLlegada: item.fechaLlegada,
+                        fechaOrden: item.fechaOrden,
                       );
                       if (onTapTurno == null) return queueItem;
                       return InkWell(
