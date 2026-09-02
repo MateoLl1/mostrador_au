@@ -6,7 +6,7 @@ class QueueItem extends StatelessWidget {
   final bool isNext;
   final String? canal;
 
-  /// Fechas de diagnóstico de la cola. Solo llegan con datos para Sistemas.
+  /// Fechas de diagnóstico de la cola: cita y llegada del turno.
   final DateTime? fechaCita;
   final DateTime? fechaLlegada;
   final DateTime? fechaOrden;
@@ -46,6 +46,10 @@ class QueueItem extends StatelessWidget {
         return colors.primary;
     }
   }
+
+  /// La API sigue mandando 'R' (Retail) tal cual la clasifica el canal de
+  /// atención; en el mostrador se muestra como "L" de Liviano.
+  String get _etiquetaCanal => canal == 'R' ? 'L' : (canal ?? '');
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,7 @@ class QueueItem extends StatelessWidget {
                 ),
               ),
               child: Text(
-                canal!,
+                _etiquetaCanal,
                 style: TextStyle(
                   color: _canalColor(colors),
                   fontSize: 11,
