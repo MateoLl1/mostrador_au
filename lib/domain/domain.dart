@@ -1,5 +1,6 @@
 export 'entities/entities.dart';
 export 'response/response.dart';
+export './exceptions/turno_conflict_exception.dart';
 export './datasources/auth_datasource.dart';
 export './datasources/mostrador_datasource.dart';
 export './datasources/disponibilidad_datasource.dart';

@@ -133,6 +133,14 @@ class _MostradorScreenState extends ConsumerState<MostradorScreen>
     final isActivo = ref.watch(disponibilidadProvider).isActivo;
     final session = ref.watch(appSessionProvider);
 
+    // Validaciones de negocio (ej. "ya tiene un turno en proceso"): snackbar,
+    // sin tapar la pantalla como sí hace un error real.
+    ref.listen<String?>(turnoSnackbarProvider, (previous, mensaje) {
+      if (mensaje == null) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+      ref.read(turnoSnackbarProvider.notifier).state = null;
+    });
+
     return Scaffold(
       backgroundColor: colors.surface,
       body: CustomPaint(

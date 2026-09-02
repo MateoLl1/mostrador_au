@@ -7,6 +7,11 @@ import 'package:mostrador_au/presentation/providers/providers.dart';
 // Solo relevante para Sistemas (grCodigo 11) — los demás tienen filtro fijo por rol
 final filtroSistemasProvider = StateProvider<String>((ref) => 'mostrador');
 
+/// Mensajes de validación de negocio (ej. "ya tiene un turno en proceso")
+/// para mostrar como snackbar. No se usa AsyncError para esto: son mal uso
+/// del usuario, no una falla de la app, y no deben tapar la pantalla.
+final turnoSnackbarProvider = StateProvider<String?>((ref) => null);
+
 final pantallaTurnosProvider = StateNotifierProvider.autoDispose<
     PantallaTurnosNotifier, AsyncValue<PantallaTurnosResponse>>((ref) {
   final repository = ref.watch(mostradorRepositoryProvider);
@@ -27,6 +32,8 @@ final pantallaTurnosProvider = StateNotifierProvider.autoDispose<
     agenciaId: session?.agenciaId,
     usCodigo: session?.usCodigo,
     filtro: filtro,
+    onMensajeUsuario: (mensaje) =>
+        ref.read(turnoSnackbarProvider.notifier).state = mensaje,
   );
 
   ref.onDispose(notifier.disposeTimer);
@@ -40,7 +47,12 @@ class PantallaTurnosNotifier
   final int? agenciaId;
   final int? usCodigo;
   final String filtro;
+
+  /// Reporta un mensaje de validación de negocio hacia turnoSnackbarProvider.
+  final void Function(String mensaje) onMensajeUsuario;
+
   Timer? _timer;
+  Timer? _retryTimer;
   bool _procesando = false;
   int _prevPendientes = -1;
 
@@ -49,15 +61,32 @@ class PantallaTurnosNotifier
     required this.agenciaId,
     required this.usCodigo,
     required this.filtro,
+    required this.onMensajeUsuario,
   }) : super(const AsyncLoading()) {
     loadPantalla();
     _startAutoRefresh();
   }
 
+  /// Un error real (red, servidor, etc.) sí tapa la pantalla -- pero se
+  /// reintenta solo, sin esperar los 10s del refresco periódico normal.
+  void _manejarErrorReal(Object e, StackTrace s) {
+    if (!mounted) return;
+    state = AsyncError(e, s);
+    _retryTimer?.cancel();
+    _retryTimer = Timer(
+      Duration(seconds: AppEnv.errorRetrySeconds),
+      loadPantalla,
+    );
+  }
+
   Future<void> loadPantalla() async {
     if (!mounted) return;
     if (agenciaId == null) {
-      if (mounted) state = AsyncError('No hay agencia configurada', StackTrace.current);
+      // Sin agencia = la sesión se está cerrando (clearSession ya puso la
+      // sesión en null y este provider se reconstruye un instante antes de
+      // que la navegación a /login termine). No es un error real que valga
+      // la pena alarmar en rojo -- se queda cargando hasta que la pantalla
+      // cambie sola.
       return;
     }
     try {
@@ -71,7 +100,7 @@ class PantallaTurnosNotifier
       _prevPendientes = response.turnosPendientes.length;
       state = AsyncData(response);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     }
   }
 
@@ -81,8 +110,10 @@ class PantallaTurnosNotifier
     try {
       await repository.llamarSiguienteTurno(agenciaId: agenciaId!, usCodigo: usCodigo, filtro: filtro);
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -92,15 +123,17 @@ class PantallaTurnosNotifier
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;
     if (turnoActual == null || turnoActual.asgCodigo <= 0) {
-      if (mounted) state = AsyncError('No existe un turno actual para rellamar', StackTrace.current);
+      onMensajeUsuario('No existe un turno actual para rellamar');
       return;
     }
     _procesando = true;
     try {
       await repository.rellamarTurno(asgCodigo: turnoActual.asgCodigo);
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -110,15 +143,17 @@ class PantallaTurnosNotifier
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;
     if (turnoActual == null || turnoActual.asgCodigo <= 0) {
-      if (mounted) state = AsyncError('No existe un turno actual para atender', StackTrace.current);
+      onMensajeUsuario('No existe un turno actual para atender');
       return;
     }
     _procesando = true;
     try {
       await repository.atenderTurno(asgCodigo: turnoActual.asgCodigo);
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -133,8 +168,10 @@ class PantallaTurnosNotifier
         usCodigo: usCodigo ?? 0,
       );
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -144,7 +181,7 @@ class PantallaTurnosNotifier
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;
     if (turnoActual == null || turnoActual.asgCodigo <= 0) {
-      if (mounted) state = AsyncError('No existe un turno actual para saltar', StackTrace.current);
+      onMensajeUsuario('No existe un turno actual para saltar');
       return;
     }
     _procesando = true;
@@ -154,8 +191,10 @@ class PantallaTurnosNotifier
         usCodigo: usCodigo ?? 0,
       );
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -165,15 +204,17 @@ class PantallaTurnosNotifier
     if (!mounted || _procesando) return;
     final turnoActual = state.asData?.value.turnoActual;
     if (turnoActual == null || turnoActual.asgCodigo <= 0) {
-      if (mounted) state = AsyncError('No existe un turno actual para cancelar', StackTrace.current);
+      onMensajeUsuario('No existe un turno actual para cancelar');
       return;
     }
     _procesando = true;
     try {
       await repository.cancelarTurno(asgCodigo: turnoActual.asgCodigo);
       await loadPantalla();
+    } on TurnoConflictException catch (e) {
+      onMensajeUsuario(e.mensaje);
     } catch (e, s) {
-      if (mounted) state = AsyncError(e, s);
+      _manejarErrorReal(e, s);
     } finally {
       _procesando = false;
     }
@@ -184,5 +225,8 @@ class PantallaTurnosNotifier
     _timer = Timer.periodic(const Duration(seconds: 10), (_) => loadPantalla());
   }
 
-  void disposeTimer() => _timer?.cancel();
+  void disposeTimer() {
+    _timer?.cancel();
+    _retryTimer?.cancel();
+  }
 }

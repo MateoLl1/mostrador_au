@@ -6,6 +6,21 @@ import 'package:mostrador_au/infrastructure/mappers/mappers.dart';
 class MostradorDatasourceImpl extends MostradorDatasource {
   final Dio _dio = DioFactory.create();
 
+  /// 409 con mensaje = validación esperada del negocio (ej. "ya tiene un
+  /// turno en proceso"), no una falla real -- se distingue con un tipo de
+  /// excepción propio para que el provider lo muestre como snackbar y no
+  /// como la pantalla de error completa.
+  Never _lanzarError(DioException e, String mensajePorDefecto) {
+    final data = e.response?.data;
+    final mensaje = data is Map ? data['mensaje']?.toString() : null;
+
+    if (e.response?.statusCode == 409 && mensaje != null) {
+      throw TurnoConflictException(mensaje);
+    }
+
+    throw Exception(mensaje ?? e.message ?? mensajePorDefecto);
+  }
+
   @override
   Future<PantallaTurnosResponse> getPantallaTurnos(int agenciaId, {int? usCodigo, String? filtro}) async {
     final params = <String, dynamic>{'agenciaId': agenciaId};
@@ -34,9 +49,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error llamando siguiente turno',
-      );
+      _lanzarError(e, 'Error llamando siguiente turno');
     }
   }
 
@@ -50,9 +63,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error rellamando turno',
-      );
+      _lanzarError(e, 'Error rellamando turno');
     }
   }
 
@@ -66,9 +77,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error atendiendo turno',
-      );
+      _lanzarError(e, 'Error atendiendo turno');
     }
   }
 
@@ -85,9 +94,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error llamando turno',
-      );
+      _lanzarError(e, 'Error llamando turno');
     }
   }
 
@@ -104,9 +111,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error saltando turno',
-      );
+      _lanzarError(e, 'Error saltando turno');
     }
   }
 
@@ -120,9 +125,7 @@ class MostradorDatasourceImpl extends MostradorDatasource {
       );
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
-      throw Exception(
-        e.response?.data?.toString() ?? e.message ?? 'Error cancelando turno',
-      );
+      _lanzarError(e, 'Error cancelando turno');
     }
   }
 }
