@@ -231,6 +231,11 @@ class _SessionSheet extends StatelessWidget {
                 Navigator.of(context).pop();
                 await ref.read(disponibilidadProvider.notifier).desactivar();
                 await ref.read(appSessionProvider.notifier).clearSession();
+                // loginProvider no es autoDispose: vive para toda la app, no
+                // solo mientras se ve la pantalla de login. Sin este reset,
+                // la lista de agencias (y el combo que depende de ella)
+                // quedaba visible para la siguiente persona que entrara.
+                ref.invalidate(loginProvider);
                 if (context.mounted) context.go('/login');
               },
               icon: const Icon(Icons.logout_rounded),
