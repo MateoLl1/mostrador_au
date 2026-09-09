@@ -228,7 +228,14 @@ class _SessionSheet extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () async {
-                Navigator.of(context).pop();
+                // El pop iba primero y ya dejaba el context de esta hoja
+                // desmontado para cuando terminaban los await de red -- el
+                // "if (context.mounted)" de mas abajo daba falso y
+                // context.go('/login') se saltaba en silencio. La sesion
+                // quedaba limpia igual (por eso no era un timeout real),
+                // pero nunca navegaba: se veia como que quedaba "cargando".
+                // Ahora se hace todo el trabajo primero y recien al final,
+                // con la hoja todavia montada, se cierra y se navega juntos.
                 await ref.read(disponibilidadProvider.notifier).desactivar();
                 await ref.read(appSessionProvider.notifier).clearSession();
                 // loginProvider no es autoDispose: vive para toda la app, no
@@ -236,7 +243,10 @@ class _SessionSheet extends StatelessWidget {
                 // la lista de agencias (y el combo que depende de ella)
                 // quedaba visible para la siguiente persona que entrara.
                 ref.invalidate(loginProvider);
-                if (context.mounted) context.go('/login');
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  context.go('/login');
+                }
               },
               icon: const Icon(Icons.logout_rounded),
               label: const Text('Cerrar sesión'),
